@@ -1,4 +1,6 @@
-from random import shuffle
+from random import Random, shuffle
+from re import A
+import random
 
 class Jogador:
 
@@ -61,13 +63,13 @@ class Jogo:
         name2 = input("Insira o nome do Jogador 2: ")
         name3 = input("Insira o nome do Jogador 3: ")
         name4 = input("Insira o nome do Jogador 4: ")
-        self.p1.nome = Jogador(name1)
-        self.p2.nome = Jogador(name2)
-        self.p3.nome = Jogador(name3)
-        self.p4.nome = Jogador(name4)
+        self.p1 = Jogador(name1)
+        self.p2 = Jogador(name2)
+        self.p3 = Jogador(name3)
+        self.p4 = Jogador(name4)
 
     """t=trunfo, b=baralho"""
-    def Round_(self, t, b, primeiro, placar):
+    def Round_(self, t, b, primeiro, pla1, pla2):
         """rodada=cartas jogadas pelos jogadores, calcula=array auxiliar de 'rodada'"""
         rodada=[]
         calcula=[]
@@ -119,61 +121,70 @@ class Jogo:
                     cont[0]=rodada[i].pontos[rodada[i].valor]
                     cont[1]=rodada[i].cartas.jogador
                     i+=1
-        p=cont[1]
-        
+        print(pla1," x ",pla2)
         """Tentativa de chamar a função Winner"""
-        return Winner(p,rodada,placar)
+        return Jogo.Winner(cont[1],rodada,pla1,pla2)
              
         
-    def play_game(self,p1,p2,p3,p4):
+    def play_game(self):
         baralho = Baralho()
         x=0
-        primeiro=1
+        primeiro = random.choice([1,2,3,4])
+        print("O primeiro a jogar é o Jogador ",primeiro,"!")
 
         """Divisão das cartas para fins visuais"""
         while x!=40:
-            if x>10:
-                p1.mao[x]=baralho.cartas[x]
-                baralho.cartas.jogador=1
-            elif x>20:
-                p2.mao[x%10]=baralho.cartas[x]
-                baralho.cartas.jogador=2
-            elif x>30:
-                p3.mao[x%20]=baralho.cartas[x]
-                baralho.cartas.jogador=3
+            if x<10:
+                self.p1.mao.append(baralho.cartas[x])
+                baralho.cartas[x].jogador=1
+            elif x<20:
+                self.p2.mao.append(baralho.cartas[x])
+                baralho.cartas[x].jogador=2
+            elif x<30:
+                self.p3.mao.append(baralho.cartas[x])
+                baralho.cartas[x].jogador=3
             else:
-                p4.mao[x%30]=baralho.cartas[x]
-                baralho.cartas.jogador=4
+                self.p4.mao.append(baralho.cartas[x])
+                baralho.cartas[x].jogador=4
             x+=1
             
         print("Suecaaaaaa!!")
-        for i in range(4):
-            print("O Trunfo do jogo é ",baralho.cartas.naipe[i],".")
-            trunfo=baralho.cartas.naipe[i]
+        i=random.choice([1,2,3,4])
+        print("O Trunfo do jogo é ",baralho.cartas[i].naipes[baralho.cartas[i].naipe],".")
+        trunfo=baralho.cartas[i].naipes[baralho.cartas[i].naipe]
 
         """Visualização das mãos dos jogadores"""
-        print("Jogador 1: "', '.join(p1.mao))
-        print("Jogador 2: "', '.join(p2.mao))
-        print("Jogador 3: "', '.join(p3.mao))
-        print("Jogador 4: "', '.join(p4.mao))
-        
+        i=0
+        while i!=40:
+            if i<10:
+                print("Jogador 1: ",baralho.cartas[i])
+            elif i<20:
+                print("Jogador 2: ",baralho.cartas[i])
+            elif i<30:
+                print("Jogador 3: ",baralho.cartas[i])
+            else:
+                print("Jogador 4: ",baralho.cartas[i])
+            i+=1
+            
         """Início dos rounds"""
         y=1
-        placar=[0,0]
+        placar1=0
+        placar2=0
+
         while y!=11:
-            print("Round ",y,"! Placar: ",placar)
+            print("Round ",y,"! Placar: ",placar1," x ", placar2)
             """Tentativa de chamar função Round_"""
-            placar= Round_(trunfo,baralho,primeiro,placar)
+            Jogo.Round_(trunfo,baralho,primeiro,placar1,placar2)
             y+=1
 
         """Tentativa de chamar função Vencedor"""
-        print(Vencedor(placar))
+        print(Jogo.Vencedor(placar1,placar2))
 
         nova=input("Deseja jogar novamente? Tecla qualquer tecla exceto q.")
         if nova!="q":
 
             """Tentativa de chamar função play_game"""
-            a= play_game()
+            a= Jogo.play_game()
         
 
     """"g = ganhador da rodada, r = cartas usadas pelos jogadores na rodada, placar = placar atual do jogo a ser atualizado"""
@@ -185,14 +196,15 @@ class Jogo:
         return placar
 
     """Mensagem final"""
-    def Vencedor(self,p):
-        if p[0]==p[1]:
+    def Vencedor(self,p1,p2):
+        if p1==p2:
             print("Empate!!")
-        elif p[0]>p[1]:
+        elif p1>p2:
             print("A equipe 1 ganhou!")
         else:
             print("A equipe 2 ganhou!")
 
 
-
+novojogo= Jogo()
+novojogo.play_game()
 
