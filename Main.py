@@ -118,6 +118,7 @@ class Jogo:
                 if rodada[i].pontos[rodada[i].valor]>cont[0]:
                     cont[0]=rodada[i].pontos[rodada[i].valor]
                     cont[1]=rodada[i].cartas.jogador
+                    i+=1
         p=cont[1]
         
         """Tentativa de chamar a função Winner"""
