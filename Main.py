@@ -69,44 +69,46 @@ class Jogo:
         self.p4 = Jogador(name4)
 
     """t=trunfo, b=baralho"""
-    def Round_(self, t, b, primeiro, pla1, pla2):
+
+    def Round_(t, b, primeiro, pla1, pla2):
         """rodada=cartas jogadas pelos jogadores, calcula=array auxiliar de 'rodada'"""
-        rodada=[]
-        calcula=[]
+        rodada=[0,0,0,0]
+        calcula=[0,0,0,0]
         x=0
         p=primeiro
         """Introdução das cartas a array 'rodada'. O primeiro a jogar guarda a carta na posição 0"""
         while x!=4:
-            if p==3:
-                mesa=int(input("Jogador ",p," digite a carta que deseja jogar(1-10): "))
-                if mesa<1 or mesa>10 or b[(mesa-1)+(p*10)]==None:
+            if p==4:
+                mesa=int(input(f"Jogador {p} digite a carta que deseja jogar(1-10): "))
+                i=(mesa-1)+((p-1)*10)
+                if mesa<1 or mesa>10 or b.cartas[i]==None:
                     return False
                 else:      
-                    rodada[x]=b[(mesa-1)+(p*10)]
-                    print(b[(mesa-1)+(p*10)])
-                    b[(mesa-1)+(p*10)]=None
-                p=0
+                    rodada[x]=b.cartas[i]
+                    print(b.cartas[i])
+                    b.cartas[i]=None
+                p=1
                 x+=1
             else:
-                mesa=int(input("Jogador ",p," digite a carta que deseja jogar(1-10): "))
-                if mesa<1 or mesa>10 or b[(mesa-1)+(p*10)]==None:
+                mesa=int(input(f"Jogador {p} digite a carta que deseja jogar(1-10): "))
+                i=(mesa-1)+((p-1)*10)
+                if mesa<1 or mesa>10 or b.cartas[i]==None:
                   return False
                 else:      
-                    rodada[x]=b[(mesa-1)+(p*10)]
-                    print(b[(mesa-1)+(p*10)])
-                    b[(mesa-1)+(p*10)]=None
+                    rodada[x]=b.cartas[i]
+                    print(b.cartas[i])
+                    b.cartas[i]=None
                 p+=1
                 x+=1
 
         """Decisão do vencedor da rodada"""
         i=0
         j=0
-
         """cont[0] guarda os pontos da maior carta, cont[1] guarda o jogador que a jogou (variável temporária)"""
         cont=[]
         while i!=4:
-            if t in rodada[i].naipe:
-                calcula[i]=int(rodada[i].pontos[rodada[i].valor])
+            if t == rodada[i].naipes[rodada[i].naipe]:
+                calcula[i]=rodada[i].pontos[rodada[i].valor]
                 i+=1
         if calcula!=[]:
             while j!=4:
