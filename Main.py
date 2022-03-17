@@ -2,10 +2,11 @@ from random import shuffle
 
 class Jogador:
 
-    def __init__(self,n,i):
+    def __init__(self,n):
         self.nome = n
-        self.id = i
         self.mao = []
+    
+
     
 class Carta:
     naipes = ["Espadas", "Copas",
@@ -42,6 +43,7 @@ class Carta:
         return v
 
 
+
 class Baralho:
     def __init__(self):
         self.cartas = []
@@ -59,101 +61,126 @@ class Jogo:
         name2 = input("Insira o nome do Jogador 2: ")
         name3 = input("Insira o nome do Jogador 3: ")
         name4 = input("Insira o nome do Jogador 4: ")
-        self.baralho = Baralho()
-        self.p1 = Jogador(name1)
-        self.p2 = Jogador(name2)
-        self.p3 = Jogador(name3)
-        self.p4 = Jogador(name4)
+        self.p1.nome = Jogador(name1)
+        self.p2.nome = Jogador(name2)
+        self.p3.nome = Jogador(name3)
+        self.p4.nome = Jogador(name4)
 
-    def wins(self, winner):
-        w = "{} wins this round"
-        w = w.format(winner)
-        print(w)
-
-    def draw(self, p1n, p1c, p2n, p2c):
-        d = "{} drew {} {} drew {}"
-        d = d.format(p1n,
-                     p1c,
-                     p2n,
-                     p2c)
-        print(d)
-
-    def round_
-
-    def iniciar_rodada(self):
-        cartas = self.baralho.cartas
-        
-    def play_game(self):
-        baralho = iniciar+rodada()
+    """t=trunfo, b=baralho, p=primeiro a jogar"""
+    def Round_(self, t, b, p, placar):
+        """rodada=cartas jogadas pelos jogadores, calcula=array auxiliar de 'rodada'"""
+        rodada=[]
+        calcula=[]
         x=0
+
+        """Introdução das cartas a array 'rodada'. Independente de quem começou, as cartas são guardadas em ordem"""
+        while x!=4:
+            if p==3:
+                mesa=int(input("Jogador ",p," digite a carta que deseja jogar(1-10): "))
+                if mesa<1 or mesa>10 or b[(mesa-1)+(p*10)]==None:
+                    return False
+                else:      
+                    rodada[p]=b[(mesa-1)+(p*10)]
+                    print(b[(mesa-1)+(p*10)])
+                    b[(mesa-1)+(p*10)]=None
+                p=0
+                x+=1
+            else:
+                mesa=int(input("Jogador ",p," digite a carta que deseja jogar(1-10): "))
+                if mesa<1 or mesa>10 or b[(mesa-1)+(p*10)]==None:
+                  return False
+                else:      
+                    rodada[p]=b[(mesa-1)+(p*10)]
+                    print(b[(mesa-1)+(p*10)])
+                    b[(mesa-1)+(p*10)]=None
+                p+=1
+                x+=1
+
+        """Decisão do vencedor da rodada"""
+        i=0
+        j=0
+        """cont[0] guarda os pontos da maior carta, cont[1] guarda o jogador que a jogou"""
+        cont=[]
+        while i!=4:
+            if t in rodada[i].naipe:
+                calcula[i]=int(rodada[i].pontos[rodada[i].valor])
+                i+=1
+        if calcula!=[]:
+            while j!=4:
+                if calcula[j]>cont[0]:
+                    cont[0]=calcula[j]
+                    cont[1]=j
+                    j+=1
+        else:
+            i=0
+            while i!=4:
+                if rodada[i].pontos[rodada[i].valor]>cont[0]:
+                    cont[0]=rodada[i].pontos[rodada[i].valor]
+                    cont[1]=i
+        p=cont[1]
+        
+        return Winner(p,rodada,placar)
+             
+        
+    def play_game(self,p1,p2,p3,p4):
+        baralho = Baralho()
+        x=0
+        primeiro=1
+        """Divisão das cartas para fins visuais"""
         while x!=40:
             if x>10:
-                y=0
-                p1.mao[y]=cartas[x]
+                p1.mao[x]=baralho.cartas[x]
             elif x>20:
-                y=0
-                p2.mao[y]=cartas[x]
+                p2.mao[x%10]=baralho.cartas[x]
             elif x>30:
-                y=0
-                p3.mao[y]=cartas[x]
+                p3.mao[x%20]=baralho.cartas[x]
             else:
-                y=0
-                p4.mao[y]=cartas[x]
-        x+=1
+                p4.mao[x%30]=baralho.cartas[x]
+            x+=1
             
         print("Suecaaaaaa!!")
         for i in range(4):
-                print("O Trunfo do jogo é ",cartas.naipe[i],".")
+            print("O Trunfo do jogo é ",baralho.cartas.naipe[i],".")
+            trunfo=baralho.cartas.naipe[i]
 
+        """Visualização das mãos dos jogadores"""
         print("Jogador 1: "', '.join(p1.mao))
         print("Jogador 2: "', '.join(p2.mao))
         print("Jogador 3: "', '.join(p3.mao))
         print("Jogador 4: "', '.join(p4.mao))
         
-        x=1
-        while x!= 0:
-            print("Round ",x,"!")
-            
-            m = "Tecle 'q' para sair. Qualquer tecla para jogar: "
-            response = input(m)
-            if response == 'q':
-                break
-            while x!=11:
-                rodada= round_()
-            
-            
+        """Início dos rounds"""
+        y=1
+        placar=[0,0]
+        while y!=11:
+            print("Round ",y,"! Placar: ",placar)
+            placar= Round_(trunfo,baralho,primeiro,placar)
+            y+=1
+        
+        print(Vencedor(placar))
+
+        nova=input("Deseja jogar novamente? Tecla qualquer tecla exceto q.")
+        if nova!="q":
+            a= play_game()
+        
+
+    """"g = ganhador da rodada, r = cartas usadas pelos jogadores na rodada, placar = placar atual do jogo a ser atualizado"""
+    def Winner(self, g, r, placar): 
+        print("O vencedor da rodada é o Jogador ",g,"!")
+
+        placar[0]=int(r[0].pontos[r[0].valor] + r[2].pontos[r[2].valor])
+        placar[1]=int(r[1].pontos[r[1].valor] + r[3].pontos[r[3].valor])
+        return placar
+
+    """Mensagem final"""
+    def Vencedor(self,p):
+        if p[0]==p[1]:
+            print("Empate!!")
+        elif p[0]>p[1]:
+            print("A equipe 1 ganhou!")
+        else:
+            print("A equipe 2 ganhou!")
 
 
-
-
-
-                
-            p1 = self.deck.rm_card()
-            p2 = self.deck.rm_card()
-            p1n = self.p1.name
-            p2n = self.p2.name
-            self.draw(p1n,
-                      p1c,
-                      p2n,
-                      p2c)
-            if p1c > p2c:
-                self.p1.wins += 1
-                self.wins(self.p1.name)
-            else:
-                self.p2.wins += 1
-                self.wins(self.p2.name)
-
-            x+=1
-
-        win = self.winner(self.p1,
-                         self.p2)
-        print("War is over.{} wins".format(win))
-
-    def winner(self, p1, p2):
-        if p1.wins > p2.wins:
-            return p1.name
-        if p1.wins < p2.wins:
-            return p2.name
-        return "It was a tie!"   
 
 
