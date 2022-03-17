@@ -7,7 +7,7 @@ class Jogador:
         self.mao = []
     
 
-    
+
 class Carta:
     naipes = ["Espadas", "Copas",
              "Ouros", "Paus"]
@@ -26,7 +26,7 @@ class Carta:
 
         self.valor = v
         self.naipe = n
-        self.ganhador = e = 0
+        self.jogador = 0
 
     def __ne__(self, c2):
         if self.valor != c2.valor:
@@ -66,21 +66,21 @@ class Jogo:
         self.p3.nome = Jogador(name3)
         self.p4.nome = Jogador(name4)
 
-    """t=trunfo, b=baralho, p=primeiro a jogar"""
-    def Round_(self, t, b, p, placar):
+    """t=trunfo, b=baralho"""
+    def Round_(self, t, b, primeiro, placar):
         """rodada=cartas jogadas pelos jogadores, calcula=array auxiliar de 'rodada'"""
         rodada=[]
         calcula=[]
         x=0
-
-        """Introdução das cartas a array 'rodada'. Independente de quem começou, as cartas são guardadas em ordem"""
+        p=primeiro
+        """Introdução das cartas a array 'rodada'. O primeiro a jogar guarda a carta na posição 0"""
         while x!=4:
             if p==3:
                 mesa=int(input("Jogador ",p," digite a carta que deseja jogar(1-10): "))
                 if mesa<1 or mesa>10 or b[(mesa-1)+(p*10)]==None:
                     return False
                 else:      
-                    rodada[p]=b[(mesa-1)+(p*10)]
+                    rodada[x]=b[(mesa-1)+(p*10)]
                     print(b[(mesa-1)+(p*10)])
                     b[(mesa-1)+(p*10)]=None
                 p=0
@@ -90,7 +90,7 @@ class Jogo:
                 if mesa<1 or mesa>10 or b[(mesa-1)+(p*10)]==None:
                   return False
                 else:      
-                    rodada[p]=b[(mesa-1)+(p*10)]
+                    rodada[x]=b[(mesa-1)+(p*10)]
                     print(b[(mesa-1)+(p*10)])
                     b[(mesa-1)+(p*10)]=None
                 p+=1
@@ -99,7 +99,8 @@ class Jogo:
         """Decisão do vencedor da rodada"""
         i=0
         j=0
-        """cont[0] guarda os pontos da maior carta, cont[1] guarda o jogador que a jogou"""
+
+        """cont[0] guarda os pontos da maior carta, cont[1] guarda o jogador que a jogou (variável temporária)"""
         cont=[]
         while i!=4:
             if t in rodada[i].naipe:
@@ -109,16 +110,17 @@ class Jogo:
             while j!=4:
                 if calcula[j]>cont[0]:
                     cont[0]=calcula[j]
-                    cont[1]=j
+                    cont[1]=calcula[j].cartas.jogador
                     j+=1
         else:
             i=0
             while i!=4:
                 if rodada[i].pontos[rodada[i].valor]>cont[0]:
                     cont[0]=rodada[i].pontos[rodada[i].valor]
-                    cont[1]=i
+                    cont[1]=rodada[i].cartas.jogador
         p=cont[1]
         
+        """Tentativa de chamar a função Winner"""
         return Winner(p,rodada,placar)
              
         
@@ -126,16 +128,21 @@ class Jogo:
         baralho = Baralho()
         x=0
         primeiro=1
+
         """Divisão das cartas para fins visuais"""
         while x!=40:
             if x>10:
                 p1.mao[x]=baralho.cartas[x]
+                baralho.cartas.jogador=1
             elif x>20:
                 p2.mao[x%10]=baralho.cartas[x]
+                baralho.cartas.jogador=2
             elif x>30:
                 p3.mao[x%20]=baralho.cartas[x]
+                baralho.cartas.jogador=3
             else:
                 p4.mao[x%30]=baralho.cartas[x]
+                baralho.cartas.jogador=4
             x+=1
             
         print("Suecaaaaaa!!")
@@ -154,13 +161,17 @@ class Jogo:
         placar=[0,0]
         while y!=11:
             print("Round ",y,"! Placar: ",placar)
+            """Tentativa de chamar função Round_"""
             placar= Round_(trunfo,baralho,primeiro,placar)
             y+=1
-        
+
+        """Tentativa de chamar função Vencedor"""
         print(Vencedor(placar))
 
         nova=input("Deseja jogar novamente? Tecla qualquer tecla exceto q.")
         if nova!="q":
+
+            """Tentativa de chamar função play_game"""
             a= play_game()
         
 
