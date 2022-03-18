@@ -15,13 +15,13 @@ class Carta:
              "Ouros", "Paus"]
     
     valores = [None, None, "2","3",
-              "4", "5", "6", "7",
+              "4", "5", "6",
               "Valete", "Rainha",
-              "Rei", "Ás"]
+              "Rei","7", "Ás"]
     
     pontos = [None, None, "0", "0",
-              "0", "0", "0", "10",
-              "3", "2", "4", "11"]
+              "0", "0", "0",
+              "3", "2", "4","10", "11"]
 
     
     def __init__(self, v, n):
@@ -76,6 +76,8 @@ class Jogo:
         calcula=[0,0,0,0]
         x=0
         p=primeiro
+
+        print("O Trunfo do jogo é ",t,".")
         """Introdução das cartas a array 'rodada'. O primeiro a jogar guarda a carta na posição 0"""
         while x!=4:
             if p==4:
@@ -102,31 +104,33 @@ class Jogo:
                 x+=1
     
         """Decisão do vencedor da rodada"""
-        i=0
-        j=0
         """cont[0] guarda os pontos da maior carta, cont[1] guarda o jogador que a jogou (variável temporária)"""
         cont=[0,0]
-        while i!=4:
-            if t == rodada[i].naipes[rodada[i].naipe]:
-                calcula[i]=rodada[i].pontos[rodada[i].valor]
-            i+=1
+        j=0
 
-        if calcula!=[0,0,0,0]:
-            while j!=4:
-                if int(calcula[j])>int(cont[0]):
-                    cont[0]=calcula[j]
-                    cont[1]=rodada[j].jogador
-                    print(rodada[j].jogador)
+        for i in range(4):
+
+            if t == rodada[i].naipes[rodada[i].naipe]: 
+                calcula[i]=rodada[i].valor
+                int(calcula[i])
                 j+=1
-        else:
-            i=0
-            while i!=4:
-                if int(rodada[i].pontos[rodada[i].valor])>int(cont[0]):
-                    cont[0]=rodada[i].pontos[rodada[i].valor]
-                    cont[1]=rodada[i].jogador
-                i+=1
 
-        """Tentativa de chamar a função Winner"""
+        if j==0:
+            for i in range(4):
+                calcula[i]=rodada[i].valor
+
+            for i in range(4):
+                if calcula[i]>cont[0]:
+                    cont[0]=calcula[i]
+                    cont[1]=rodada[i].jogador
+
+        else:
+            for i in range(4):
+                if calcula[i]>cont[0]:
+                    cont[0]=calcula[i]
+                    cont[1]=rodada[i].jogador
+
+        """Retorna a função Winner"""
         return Jogo.Winner(cont[1],rodada,pla1,pla2)
              
         
@@ -154,21 +158,19 @@ class Jogo:
             
         print("Suecaaaaaa!!")
         i=random.choice([1,2,3,4])
-        print("O Trunfo do jogo é ",baralho.cartas[i].naipes[baralho.cartas[i].naipe],".")
         trunfo=baralho.cartas[i].naipes[baralho.cartas[i].naipe]
 
         """Visualização das mãos dos jogadores"""
-        i=0
-        while i!=40:
+        for i in range(40):
             if i<10:
-                print("Jogador 1: ",baralho.cartas[i])
+                print("Jogador 1 (",i+1,"): ",baralho.cartas[i])
             elif i<20:
-                print("Jogador 2: ",baralho.cartas[i])
+                print("Jogador 2 (",i%10+1,"): ",baralho.cartas[i])
             elif i<30:
-                print("Jogador 3: ",baralho.cartas[i])
+                print("Jogador 3 (",i%20+1,"): ",baralho.cartas[i])
             else:
-                print("Jogador 4: ",baralho.cartas[i])
-            i+=1
+                print("Jogador 4 (",i%30+1,"): ",baralho.cartas[i])
+            
             
         """Início dos rounds"""
         y=1
@@ -176,6 +178,20 @@ class Jogo:
         placar2=0
 
         while y!=11:
+            if y!=1:
+                for i in range(40):
+                    if baralho.cartas[i]==None:
+                        baralho.cartas[i]=' '
+
+                    if i<10:
+                        print("Jogador 1 (",i+1,"): ",baralho.cartas[i])
+                    elif i<20:
+                        print("Jogador 2 (",i%10+1,"): ",baralho.cartas[i])
+                    elif i<30:
+                        print("Jogador 3 (",i%20+1,"): ",baralho.cartas[i])
+                    else:
+                        print("Jogador 4 (",i%30+1,"): ",baralho.cartas[i])
+
             print("Round ",y,"! Placar: ",placar1," x ", placar2)
             """Tentativa de chamar função Round_"""
             placar1, placar2, primeiro=Jogo.Round_(trunfo,baralho,primeiro,placar1,placar2)
@@ -185,13 +201,13 @@ class Jogo:
             y+=1
 
         """Tentativa de chamar função Vencedor"""
-        print(Jogo.Vencedor(placar1,placar2))
+        Jogo.Vencedor(placar1,placar2)
 
-        nova=input("Deseja jogar novamente? Tecla qualquer tecla exceto q.")
+        nova=input("Deseja jogar novamente? Tecla qualquer tecla exceto q: ")
         if nova!="q":
 
             """Tentativa de chamar função play_game"""
-            a= Jogo.play_game()
+            Jogo.play_game(self)
         
 
     """"g = ganhador da rodada, r = cartas usadas pelos jogadores na rodada, placar = placar atual do jogo a ser atualizado"""
@@ -205,9 +221,10 @@ class Jogo:
                 placar1+=int(r[i-1].pontos[r[i-1].valor])
 
         return placar1, placar2, g
+    """Retorna os placares atualizados e o primeiro jogador a jogar o proximo round"""
 
     """Mensagem final"""
-    def Vencedor(self,p1,p2):
+    def Vencedor(p1,p2):
         if p1==p2:
             print("Empate!!")
         elif p1>p2:
