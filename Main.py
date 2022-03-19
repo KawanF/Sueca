@@ -1,12 +1,14 @@
 from random import Random, shuffle
 from re import A
 import random
+from traceback import print_tb
 
 class Jogador:
 
     def __init__(self,n):
         self.nome = n
         self.mao = []
+        self.pontos = 0
     
 
 
@@ -30,15 +32,7 @@ class Carta:
         self.naipe = n
         self.jogador = 0
 
-    def __ne__(self, c2):
-        if self.valor != c2.valor:
-            return True
-        if self.valor == c2.valor:
-            if self.naipe != c2.naipe:
-                return True
-            else:
-                return False
-        return False
+
 
     def __repr__(self):
         v = self.valores[self.valor] + " de " + self.naipes[self.naipe]
@@ -68,8 +62,21 @@ class Jogo:
         self.p3 = Jogador(name3)
         self.p4 = Jogador(name4)
 
-    """t=trunfo, b=baralho"""
+    def embaralhar(b):
+        for x in range(40):
+            y=random.randint(0,40)
+            b.cartas[x], b.cartas[y] = b.cartas[y], b.cartas[x]
+        return b
 
+    """Verifica se a mão do jogador tem carta do primeiro naipe jogado"""
+    def verifica_naipe(b, player, n):
+        for i in range(10):
+            if b.cartas[i+((player-1)*10)]!=None:
+                if b.cartas[i+((player-1)*10)].naipes[b.cartas[i+((player-1)*10)].naipe]== n:
+                    return True
+        return False
+
+    """t=trunfo, b=baralho"""
     def Round_(t, b, primeiro, pla1, pla2):
         """rodada=cartas jogadas pelos jogadores, calcula=array auxiliar de 'rodada'"""
         rodada=[0,0,0,0]
@@ -78,30 +85,77 @@ class Jogo:
         p=primeiro
 
         print("O Trunfo do jogo é ",t,".")
+        """Primeira jogado, irá guardar o naipe da rodada"""
+        while True:                   
+            mesa=int(input(f"Jogador {p} digite a carta que deseja jogar(1-10): "))
+            i=(mesa-1)+((p-1)*10)
+            if mesa<1 or mesa>10:
+                print("Número inválido!")
+            elif b.cartas[i]==None:
+                print("Carta já usada!")
+            else:      
+                rodada[0]=b.cartas[i]
+                print(b.cartas[i])
+                naipePrimeiro=b.cartas[i].naipes[b.cartas[i].naipe]
+                b.cartas[i]=None
+                if p ==4:
+                    p=1
+                else:
+                    p+=1
+                break
+
         """Introdução das cartas a array 'rodada'. O primeiro a jogar guarda a carta na posição 0"""
-        while x!=4:
+        for x in range(1,4):
             if p==4:
-                mesa=int(input(f"Jogador {p} digite a carta que deseja jogar(1-10): "))
-                i=(mesa-1)+((p-1)*10)
-                if mesa<1 or mesa>10 or b.cartas[i]==None:
-                    return False
-                else:      
-                    rodada[x]=b.cartas[i]
-                    print(b.cartas[i])
-                    b.cartas[i]=None
-                p=1
-                x+=1
+                while True:                   
+                    mesa=int(input(f"Jogador {p} digite a carta que deseja jogar(1-10): "))
+                    i=(mesa-1)+((p-1)*10)
+                    if mesa<1 or mesa>10:
+                        print("Número inválido!")
+                    elif b.cartas[i]==None:
+                        print("Carta já usada!")
+                    elif Jogo.verifica_naipe(b,p,naipePrimeiro) == True:  
+                        if b.cartas[i].naipes[b.cartas[i].naipe]==naipePrimeiro or b.cartas[i].naipes[b.cartas[i].naipe]==t:
+                            rodada[x]=b.cartas[i]
+                            print(b.cartas[i])
+                            b.cartas[i]=None
+                            p=1
+                            break
+                        else:
+                            print("Naipe da carta inválido!")
+
+                    else:      
+                        rodada[x]=b.cartas[i]
+                        print(b.cartas[i])
+                        b.cartas[i]=None
+                        p=1
+                        break
+
             else:
-                mesa=int(input(f"Jogador {p} digite a carta que deseja jogar(1-10): "))
-                i=(mesa-1)+((p-1)*10)
-                if mesa<1 or mesa>10 or b.cartas[i]==None:
-                  return False
-                else:      
-                    rodada[x]=b.cartas[i]
-                    print(b.cartas[i])
-                    b.cartas[i]=None
-                p+=1
-                x+=1
+                while True:
+                    mesa=int(input(f"Jogador {p} digite a carta que deseja jogar(1-10): "))
+                    i=(mesa-1)+((p-1)*10)
+                    if mesa<1 or mesa>10:
+                        print("Número inválido!")
+                    elif b.cartas[i]==None:
+                        print("Carta já usada!")
+                    elif Jogo.verifica_naipe(b,p,naipePrimeiro) == True:  
+                        if b.cartas[i].naipes[b.cartas[i].naipe]==naipePrimeiro or b.cartas[i].naipes[b.cartas[i].naipe]==t:
+                            rodada[x]=b.cartas[i]
+                            print(b.cartas[i])
+                            b.cartas[i]=None
+                            p+=1
+                            break
+                        else:
+                            print("Naipe da carta inválido!")
+                    
+                    else:      
+                        rodada[x]=b.cartas[i]
+                        print(b.cartas[i])
+                        b.cartas[i]=None
+                        p+=1
+                        break
+
     
         """Decisão do vencedor da rodada"""
         """cont[0] guarda os pontos da maior carta, cont[1] guarda o jogador que a jogou (variável temporária)"""
@@ -161,15 +215,15 @@ class Jogo:
         trunfo=baralho.cartas[i].naipes[baralho.cartas[i].naipe]
 
         """Visualização das mãos dos jogadores"""
-        for i in range(40):
-            if i<10:
-                print("Jogador 1 (",i+1,"): ",baralho.cartas[i])
-            elif i<20:
-                print("Jogador 2 (",i%10+1,"): ",baralho.cartas[i])
-            elif i<30:
-                print("Jogador 3 (",i%20+1,"): ",baralho.cartas[i])
+        for i in range(4):
+            if i<1:
+                print("Jogador 1: ",self.p1.mao)
+            elif i<2:
+                print("Jogador 2: ",self.p2.mao)
+            elif i<3:
+                print("Jogador 3: ",self.p3.mao)
             else:
-                print("Jogador 4 (",i%30+1,"): ",baralho.cartas[i])
+                print("Jogador 4: ",self.p4.mao)
             
             
         """Início dos rounds"""
@@ -181,16 +235,24 @@ class Jogo:
             if y!=1:
                 for i in range(40):
                     if baralho.cartas[i]==None:
-                        baralho.cartas[i]=' '
+                        if i<10:
+                            self.p1.mao[i]=' '
+                        elif i<20:
+                            self.p2.mao[i%10]=' '
+                        elif i<30:
+                            self.p3.mao[i%20]=' '
+                        else:
+                            self.p4.mao[i%30]=' '
 
-                    if i<10:
-                        print("Jogador 1 (",i+1,"): ",baralho.cartas[i])
-                    elif i<20:
-                        print("Jogador 2 (",i%10+1,"): ",baralho.cartas[i])
-                    elif i<30:
-                        print("Jogador 3 (",i%20+1,"): ",baralho.cartas[i])
+                for i in range(4):
+                    if i<1:
+                        print("Jogador 1: ",self.p1.mao)
+                    elif i<2:
+                        print("Jogador 2: ",self.p2.mao)
+                    elif i<3:
+                        print("Jogador 3: ",self.p3.mao)
                     else:
-                        print("Jogador 4 (",i%30+1,"): ",baralho.cartas[i])
+                        print("Jogador 4: ",self.p4.mao)
 
             print("Round ",y,"! Placar: ",placar1," x ", placar2)
             """Tentativa de chamar função Round_"""
@@ -207,6 +269,7 @@ class Jogo:
         if nova!="q":
 
             """Tentativa de chamar função play_game"""
+            baralho=Baralho()
             Jogo.play_game(self)
         
 
@@ -231,7 +294,6 @@ class Jogo:
             print("A equipe 1 ganhou!")
         else:
             print("A equipe 2 ganhou!")
-
 
 novojogo= Jogo()
 novojogo.play_game()
